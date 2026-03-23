@@ -92,6 +92,7 @@
         devShells.default = pkgs.mkShell rec {
           nativeBuildInputs = [ pkgs.pkg-config ];
           buildInputs = with pkgs; [
+            devenv
             clang
             llvmPackages.bintools
             # shouldn't need this, but rustup (andt thus cargo), is too old for 2024 edition requirements:

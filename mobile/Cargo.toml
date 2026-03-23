@@ -27,7 +27,7 @@ resources = "../build/android/res"
 build_targets = ["aarch64-linux-android"]
 
 [package.metadata.android.sdk]
-target_sdk_version = 35
+target_sdk_version = 34
 
 [package.metadata.android.application]
 icon = "@mipmap/icon"
