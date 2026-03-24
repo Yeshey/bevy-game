@@ -2,7 +2,7 @@
   description = "Bevy Game development environment";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     # nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     nixgl = {
@@ -22,11 +22,11 @@
 
         pkgs = import nixpkgs {
           inherit system;
-          overlays = if (isLinux && isImpure) 
+          overlays = if (isLinux && isImpure)
             then [ nixgl.overlays.default ]
             else [ ];
         };
-        
+
         linuxPackages = with pkgs; [
           alsa-lib
           alsa-plugins
@@ -43,16 +43,16 @@
         ]) else [];
 
         # Platform-specific packages
-        platformPackages = 
+        platformPackages =
           (if (isLinux && !isImpure) then
             linuxPackages
           else if isLinux then
-            linuxPackages ++ linuxImpurePackages 
+            linuxPackages ++ linuxImpurePackages
           else if isDarwin then
             appleLibs
           else
             [ ]);
-        
+
         # Common bindgen configuration
         commonBindgenIncludes = with pkgs; [
           ''-I"${llvmPackages_latest.libclang.lib}/lib/clang/${llvmPackages_latest.libclang.version}/include"''
@@ -64,7 +64,7 @@
             glibc.dev
           ]
         else [];
-        
+
         platformBindgenIncludes = if isLinux then
           with pkgs; [
             ''-I"${glib.dev}/include/glib-2.0"''
@@ -75,7 +75,7 @@
         # It's standard in nix to pin the versions for reproducibility; here's where we
         # pin the Rust toolchain.
         overrides = (builtins.fromTOML (builtins.readFile (self + "/nix/rust-toolchain.toml")));
-        
+
         # Platform-specific shell hook
         platformShellHook = if isLinux then ''
           alias gl='nixGL'
@@ -83,7 +83,7 @@
           ''
         else
           "";
-          
+
         libPath = with pkgs; lib.makeLibraryPath [
           # load external libraries that you need in your rust project here
         ];
@@ -123,9 +123,9 @@
           RUSTFLAGS = (builtins.map (a: ''-L ${a}/lib'') [
             # add libraries here (e.g. pkgs.libvmi)
           ]);
-          
-          LD_LIBRARY_PATH = 
-            (pkgs.lib.makeLibraryPath (buildInputs ++ nativeBuildInputs)) + 
+
+          LD_LIBRARY_PATH =
+            (pkgs.lib.makeLibraryPath (buildInputs ++ nativeBuildInputs)) +
             # packages with non-standard lib paths:
             (if isLinux then ":${pkgs.alsa-plugins}/lib/alsa-lib" else "");
 
