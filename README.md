@@ -1,4 +1,4 @@
-Web Version: https://yeshey.github.io/bevy-game/ (Is the github action working?)
+Web Version: https://yeshey.github.io/bevy-game/ (Is the github action working?)  
 (Template from: https://github.com/NiklasEi/bevy_game_template)
 
 # A Bevy game
