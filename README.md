@@ -1,3 +1,5 @@
+(Template from: https://github.com/NiklasEi/bevy_game_template)
+
 # A Bevy game
 
 ## How to run
