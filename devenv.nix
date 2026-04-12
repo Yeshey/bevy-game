@@ -8,7 +8,7 @@
   languages.rust = {
     enable = true;
     channel = "stable";
-    targets = [ "aarch64-linux-android" ];
+    targets = [ "aarch64-linux-android" "wasm32-unknown-unknown" ];
   };
 
   android = {
@@ -23,6 +23,9 @@
   };
 
   packages = with pkgs; [
+    trunk 
+    wasm-pack
+    wasm-bindgen-cli
     cargo-apk
     cargo-ndk
     alsa-lib

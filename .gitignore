@@ -2,6 +2,8 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+# web
+/dist
 
 rust/.cargo/config.toml
 

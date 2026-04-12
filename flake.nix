@@ -92,6 +92,7 @@
         devShells.default = pkgs.mkShell rec {
           nativeBuildInputs = [ pkgs.pkg-config ];
           buildInputs = with pkgs; [
+            trunk
             devenv
             clang
             llvmPackages.bintools

@@ -6,6 +6,7 @@
 
 - mobile: `cargo apk run -p mobile`
 - desktop: `cargo run`
+- web: `trunk serve`
 
 Extra: `cargo clean`
 
