@@ -13,50 +13,39 @@ permissions:
   contents: write
 
 jobs:
-  build-and-deploy:
+  build-web:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 1. Debounce (Wait 1 hour)
       - name: Wait for more commits (Debounce)
-        run: sleep 3
+        if: github.event_name == 'push'
+        run: sleep 3600
 
-      # 2. Clear space (Nix can be hungry)
       - name: Free up disk space for Nix
         uses: wimpysworld/nothing-but-nix@main
 
-      # 3. Setup Nix
       - name: Install Nix
         uses: cachix/install-nix-action@v31
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
 
-      # 4. Install Devenv CLI 
-      # We need the CLI so that the .envrc 'use devenv' command works
-      - name: Install Devenv
-        run: nix profile install github:cachix/devenv
+      - name: Install devenv
+        run: nix profile install nixpkgs#devenv
 
-      # 5. Load the environment using Direnv
-      # This step executes your .envrc, which runs 'use flake' AND 'use devenv'
-      - name: Load Environment (.envrc)
-        uses: direnv/direnv-action@v1
+      - name: Build Release
+        run: |
+          nix develop --command devenv shell -- trunk build --release
 
-      # 6. Build Release
-      # Because the step above loaded the environment, 'trunk' is now in the PATH
-      - name: Build with Trunk
-        run: trunk build --release
-
-      # 7. Optimize Wasm
       - name: Optimize Wasm
         uses: NiklasEi/wasm-opt-action@v2
         with:
           file: dist/*.wasm
 
-      # 8. Deploy
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+        uses: JamesIves/github-pages-deploy-action@v4.2.5
         with:
           branch: gh-pages
           folder: dist
