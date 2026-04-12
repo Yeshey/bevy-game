@@ -1,40 +1,62 @@
 name: deploy-github-page
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
 
 jobs:
-  build-web:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Install rust toolchain
-        uses: dtolnay/rust-toolchain@master
+
+      # 1. Debounce (Wait 1 hour)
+      - name: Wait for more commits (Debounce)
+        run: sleep 3
+
+      # 2. Clear space (Nix can be hungry)
+      - name: Free up disk space for Nix
+        uses: wimpysworld/nothing-but-nix@main
+
+      # 3. Setup Nix
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
         with:
-          toolchain: stable
-      - name: Install Dependencies
-        run: sudo apt-get update; sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0 libwayland-dev
-      - name: Install trunk
-        uses: jetli/trunk-action@v0.4.0
-        with:
-          version: 'latest'
-      - name: Add wasm target
-        run: |
-          rustup target add wasm32-unknown-unknown
-      - name: Build Release
-        run: |
-          trunk build --release
-      - name: optimize Wasm
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
+      # 4. Install Devenv CLI 
+      # We need the CLI so that the .envrc 'use devenv' command works
+      - name: Install Devenv
+        run: nix profile install github:cachix/devenv
+
+      # 5. Load the environment using Direnv
+      # This step executes your .envrc, which runs 'use flake' AND 'use devenv'
+      - name: Load Environment (.envrc)
+        uses: direnv/direnv-action@v1
+
+      # 6. Build Release
+      # Because the step above loaded the environment, 'trunk' is now in the PATH
+      - name: Build with Trunk
+        run: trunk build --release
+
+      # 7. Optimize Wasm
+      - name: Optimize Wasm
         uses: NiklasEi/wasm-opt-action@v2
         with:
           file: dist/*.wasm
+
+      # 8. Deploy
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.2.5
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
           folder: dist

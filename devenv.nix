@@ -24,6 +24,7 @@
 
   packages = with pkgs; [
     trunk 
+    binaryen
     wasm-pack
     wasm-bindgen-cli
     cargo-apk
