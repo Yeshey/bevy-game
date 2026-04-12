@@ -22,7 +22,7 @@ jobs:
 
       - name: Wait for more commits (Debounce)
         if: github.event_name == 'push'
-        run: sleep 3600
+        run: sleep 3
 
       - name: Free up disk space for Nix
         uses: wimpysworld/nothing-but-nix@main
@@ -34,6 +34,17 @@ jobs:
 
       - name: Install devenv
         run: nix profile install nixpkgs#devenv
+
+      - name: Cache Cargo registry & build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target/
+          key: ${{ runner.os }}-cargo-wasm-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-wasm-
 
       - name: Build Release
         run: |
