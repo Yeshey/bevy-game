@@ -22,7 +22,7 @@ jobs:
 
       - name: Wait for more commits (Debounce)
         if: github.event_name == 'push'
-        run: sleep 3600
+        run: sleep 3
 
       - name: Free up disk space for Nix
         uses: wimpysworld/nothing-but-nix@main
