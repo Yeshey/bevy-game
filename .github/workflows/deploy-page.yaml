@@ -24,13 +24,11 @@ jobs:
         if: github.event_name == 'push'
         run: sleep 3
 
-      # Swap FIRST, before anything touches the disk
       - name: Add swap space
         uses: pierotofy/set-swap-space@master
         with:
           swap-size-gb: 10
 
-      # Synchronous purge — waits for full space reclaim before continuing
       - name: Free up disk space for Nix
         uses: wimpysworld/nothing-but-nix@main
         with:
@@ -49,32 +47,35 @@ jobs:
         with:
           primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.lock', 'devenv.lock') }}
           restore-prefixes-first-match: nix-${{ runner.os }}-
-          gc-max-store-size-linux: 4G
+          gc-max-store-size-linux: 2147483648  # 2GB — bytes, not "4G"
           purge: true
           purge-prefixes: nix-${{ runner.os }}-
           purge-last-accessed: 604800
 
-      - name: Cache Cargo artifacts
+      # Registry only — target/ is too large and fills the disk
+      - name: Cache Cargo registry
         uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target/
-          key: ${{ runner.os }}-cargo-wasm-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-cargo-wasm-
+            ${{ runner.os }}-cargo-registry-
 
       - name: Install devenv
         run: nix profile install nixpkgs#devenv
 
+      - name: Check disk space before build
+        run: |
+          df -h
+          du -sh ~/.cargo /nix ${HOME}/.rustup target 2>/dev/null || true
+
       - name: Build Release
         run: |
-          # Print memory/swap every 2 minutes in the background
           (while true; do
             echo "=== $(date -u) ==="
             free -h
-            swapon --show
             df -h /
             echo "---"
             sleep 120
