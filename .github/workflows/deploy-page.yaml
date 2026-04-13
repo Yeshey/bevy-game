@@ -78,7 +78,11 @@ jobs:
 
       - name: Optimize Wasm
         run: |
-          devenv --profile web shell -- wasm-opt -Oz --enable-bulk-memory-opt -o dist/bevy_game_bg.wasm dist/*.wasm
+          devenv --profile web shell -- wasm-opt -Oz \
+            --enable-bulk-memory \
+            --enable-nontrapping-float-to-int \
+            --enable-threads \
+            -o dist/bevy_game_bg.wasm dist/*.wasm
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4.2.5
