@@ -42,10 +42,6 @@ jobs:
           extra_nix_config: |
             build-dir = /nix/build
 
-      # Replaces cache-nix-action — no tarballs staged on root, daemon-based
-      - name: Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
-
       - name: Cache Cargo registry
         uses: actions/cache@v4
         with:
@@ -60,9 +56,7 @@ jobs:
         run: nix profile install nixpkgs#devenv
 
       - name: Check disk space before build
-        run: |
-          df -h
-          du -sh ~/.cargo /nix 2>/dev/null || true
+        run: df -h
 
       - name: Build Release
         run: |
@@ -75,12 +69,13 @@ jobs:
           done) &
           MEMMON_PID=$!
 
-          nix develop --command devenv shell -- \
+          devenv --config devenv-web.nix shell -- \
             trunk build --release --cargo-profile web-release --verbose 2>&1
 
           kill $MEMMON_PID || true
         env:
           CARGO_BUILD_JOBS: 1
+          CARGO_TARGET_DIR: /nix/build/cargo-target
 
       - name: Optimize Wasm
         uses: NiklasEi/wasm-opt-action@v2
