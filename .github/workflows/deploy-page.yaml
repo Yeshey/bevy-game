@@ -24,11 +24,6 @@ jobs:
         if: github.event_name == 'push'
         run: sleep 3
 
-      - name: Add swap space
-        uses: pierotofy/set-swap-space@master
-        with:
-          swap-size-gb: 10
-
       - name: Free up disk space for Nix
         uses: wimpysworld/nothing-but-nix@main
         with:
@@ -69,7 +64,7 @@ jobs:
           done) &
           MEMMON_PID=$!
 
-          devenv --config devenv-web.nix shell -- \
+          devenv --profile web shell -- \
             trunk build --release --cargo-profile web-release --verbose 2>&1
 
           kill $MEMMON_PID || true

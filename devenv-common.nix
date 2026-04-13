@@ -1,3 +1,4 @@
+# devenv-common.nix
 {
   pkgs,
   lib,
@@ -8,7 +9,7 @@
   languages.rust = {
     enable = true;
     channel = "stable";
-    targets = [ "wasm32-unknown-unknown" ];  # only wasm, no android
+    targets = [ "wasm32-unknown-unknown" ];
   };
 
   packages = with pkgs; [
