@@ -29,7 +29,7 @@ jobs:
         with:
           hatchet-protocol: 'rampage'
           witness-carnage: true
-          root-safe-haven: 512    # minimize space reserved on /, Cargo goes to /nix/build
+          root-safe-haven: 20480
           mnt-safe-haven: 512
 
       - name: Install Nix
@@ -43,9 +43,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            /nix/build/cargo-home/registry/index
-            /nix/build/cargo-home/registry/cache
-            /nix/build/cargo-home/git/db
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
           key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-registry-
@@ -75,7 +75,6 @@ jobs:
         env:
           CARGO_BUILD_JOBS: 1
           CARGO_TARGET_DIR: /nix/build/cargo-target
-          CARGO_HOME: /nix/build/cargo-home
 
       - name: Optimize Wasm
         uses: NiklasEi/wasm-opt-action@v2
