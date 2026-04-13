@@ -37,6 +37,9 @@ jobs:
           remove-docker-images: 'true'
           build-mount-path: '/home/runner/work'
 
+      - name: Re-checkout repository after remount
+        uses: actions/checkout@v4
+
       - name: Install Nix
         uses: cachix/install-nix-action@v31
         with:
