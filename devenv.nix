@@ -1,4 +1,3 @@
-# devenv.nix
 {
   pkgs,
   lib,
@@ -6,10 +5,8 @@
   ...
 }:
 {
-  # Common tools needed for ALL profiles
   imports = [ ./devenv-common.nix ];
 
-  # Full dev environment (default, local)
   android = {
     enable = true;
     ndk.enable = true;
@@ -21,6 +18,8 @@
     gradle.enable = true;
   };
 
+  languages.rust.targets = [ "aarch64-linux-android" ];
+
   packages = with pkgs; [
     cargo-apk
     cargo-ndk
@@ -31,8 +30,5 @@
     adb shell settings put global verifier_verify_adb_installs 0 2>/dev/null || true
   '';
 
-  # Web-only profile for CI
-  profiles.web = {
-    imports = [ ./devenv-common.nix ];
-  };
+  profiles.web.module = ./devenv-common.nix;
 }
