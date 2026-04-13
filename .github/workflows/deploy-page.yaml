@@ -24,16 +24,18 @@ jobs:
         if: github.event_name == 'push'
         run: sleep 3
 
+      # Swap FIRST, before anything touches the disk
       - name: Add swap space
         uses: pierotofy/set-swap-space@master
         with:
           swap-size-gb: 10
 
+      # Synchronous purge — waits for full space reclaim before continuing
       - name: Free up disk space for Nix
         uses: wimpysworld/nothing-but-nix@main
         with:
           hatchet-protocol: 'rampage'
-          witness-carnage: true   # synchronous — waits for full purge before continuing
+          witness-carnage: true
 
       - name: Install Nix
         uses: cachix/install-nix-action@v31
@@ -68,10 +70,23 @@ jobs:
 
       - name: Build Release
         run: |
-          nix develop --command devenv shell -- trunk build --release --verbose 2>&1
+          # Print memory/swap every 2 minutes in the background
+          (while true; do
+            echo "=== $(date -u) ==="
+            free -h
+            swapon --show
+            df -h /
+            echo "---"
+            sleep 120
+          done) &
+          MEMMON_PID=$!
+
+          nix develop --command devenv shell -- \
+            trunk build --release --cargo-profile web-release --verbose 2>&1
+
+          kill $MEMMON_PID || true
         env:
-          # Limit rustc parallelism to reduce peak memory usage
-          CARGO_BUILD_JOBS: 2
+          CARGO_BUILD_JOBS: 1
 
       - name: Optimize Wasm
         uses: NiklasEi/wasm-opt-action@v2

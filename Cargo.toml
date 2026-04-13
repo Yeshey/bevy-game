@@ -74,3 +74,10 @@ embed-resource = "1"
 
 [target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies]
 getrandom = { version = "0.3", features = ["wasm_js"] }
+
+[profile.web-release]
+inherits = "release"
+lto = "thin"        # fat LTO (lto=true) is your current setting — this halves linker RAM
+codegen-units = 4   # parallelizes codegen, much lower peak memory than 1
+opt-level = "s"
+strip = true

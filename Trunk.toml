@@ -1,5 +1,6 @@
 [build]
 public_url = "./"
+cargo_profile = "web-release"
 
 [serve]
 port = 8080
