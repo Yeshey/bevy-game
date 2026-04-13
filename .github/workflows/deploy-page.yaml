@@ -77,9 +77,8 @@ jobs:
           CARGO_TARGET_DIR: /nix/build/cargo-target
 
       - name: Optimize Wasm
-        uses: NiklasEi/wasm-opt-action@v2
-        with:
-          file: dist/*.wasm
+        run: |
+          devenv --profile web shell -- wasm-opt -Oz -o dist/bevy_game_bg.wasm dist/*.wasm
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4.2.5
