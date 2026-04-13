@@ -17,19 +17,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Maximize build space
-        uses: easimon/maximize-build-space@master
-        with:
-          root-reserve-mb: 8192
-          temp-reserve-mb: 100
-          swap-size-mb: 1024
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          remove-codeql: 'true'
-          remove-docker-images: 'true'
-          build-mount-path: '/home/runner/work/bevy-game/bevy-game'
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -37,18 +24,28 @@ jobs:
         if: github.event_name == 'push'
         run: sleep 3
 
+      - name: Free up disk space for Nix
+        uses: wimpysworld/nothing-but-nix@main
+        with:
+          hatchet-protocol: 'rampage'
+          witness-carnage: true
+          root-safe-haven: 512    # minimize space reserved on /, Cargo goes to /nix/build
+          mnt-safe-haven: 512
+
       - name: Install Nix
         uses: cachix/install-nix-action@v31
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            build-dir = /nix/build
 
       - name: Cache Cargo registry
         uses: actions/cache@v4
         with:
           path: |
-            ~/.cargo/registry/index
-            ~/.cargo/registry/cache
-            ~/.cargo/git/db
+            /nix/build/cargo-home/registry/index
+            /nix/build/cargo-home/registry/cache
+            /nix/build/cargo-home/git/db
           key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-registry-
@@ -65,6 +62,7 @@ jobs:
             echo "=== $(date -u) ==="
             free -h
             df -h /
+            df -h /nix
             echo "---"
             sleep 120
           done) &
@@ -76,6 +74,8 @@ jobs:
           kill $MEMMON_PID || true
         env:
           CARGO_BUILD_JOBS: 1
+          CARGO_TARGET_DIR: /nix/build/cargo-target
+          CARGO_HOME: /nix/build/cargo-home
 
       - name: Optimize Wasm
         uses: NiklasEi/wasm-opt-action@v2
