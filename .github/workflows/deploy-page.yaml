@@ -41,12 +41,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ~/.cargo/registry/index
-            ~/.cargo/registry/cache
-            ~/.cargo/git/db
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+            /nix/build/cargo-home/registry/index
+            /nix/build/cargo-home/registry/cache
+            /nix/build/cargo-home/git/db
+            /nix/build/cargo-target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-cargo-registry-
+            ${{ runner.os }}-cargo-
 
       - name: Install devenv
         run: nix profile install nixpkgs#devenv
@@ -71,6 +72,7 @@ jobs:
           kill $MEMMON_PID || true
         env:
           CARGO_BUILD_JOBS: 1
+          CARGO_TARGET_DIR: /mnt/cargo-target
 
       - name: Optimize Wasm
         uses: NiklasEi/wasm-opt-action@v2
