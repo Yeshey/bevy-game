@@ -41,8 +41,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ~/.cargo/registry
-            ~/.cargo/git
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
           key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-registry-
@@ -64,7 +65,7 @@ jobs:
           done) &
           MEMMON_PID=$!
 
-          devenv --profile web shell -- \
+          devenv --profile web --refresh-eval-cache shell -- \
             trunk build --release --cargo-profile web-release --verbose 2>&1
 
           kill $MEMMON_PID || true
