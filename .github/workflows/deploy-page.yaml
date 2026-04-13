@@ -53,6 +53,11 @@ jobs:
       - name: Check disk space before build
         run: df -h
 
+      - name: Prepare cargo target dir
+        run: |
+          sudo mkdir -p /nix/cargo-target
+          sudo chown -R runner:runner /nix/cargo-target
+
       - name: Build Release
         run: |
           (while true; do
