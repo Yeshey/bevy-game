@@ -5,6 +5,22 @@ Web Version: https://yeshey.github.io/bevy-game/ (Is the github action working?)
 
 If you want a peer to peer web game, use [matchbox](https://github.com/johanhelsing/matchbox), look here: https://johanhelsing.studio/posts/extreme-bevy
 
+```
+New player opens browser
+       ↓
+Hits your server (minimal bootstrap: just a libp2p peer address)
+       ↓
+Joins IPFS/Helia network via WebRTC (Helia node on browser example: https://codepen.io/2color/pen/dPyZyry)
+       ↓
+Downloads game WASM from swarm (server + other players seed it) (like in https://webtorrent.io/? Maybe not, use helia instead)
+       ↓
+Game loads, discovers other players via DHT / GossipSub
+       ↓
+Matchbox establishes WebRTC data channel between players
+       ↓
+bevy_ggrs rollback netcode runs the game session P2P
+```
+
 ## How to run
 
 - mobile: `cargo apk run -p mobile`
