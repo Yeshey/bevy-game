@@ -51,7 +51,7 @@ jobs:
             ${{ runner.os }}-cargo-registry-
 
       - name: Install devenv
-        run: nix profile install nixpkgs#devenv
+        run: nix profile add nixpkgs#devenv
 
       - name: Check disk space before build
         run: df -h

@@ -50,7 +50,7 @@ in
   android = {
     enable                = true;
     ndk.enable            = true;
-    android-studio.enable = true;
+    android-studio.enable = false;
   };
 
   languages.java = {
