@@ -73,7 +73,7 @@ jobs:
 
           kill $MEMMON_PID || true
         env:
-          CARGO_BUILD_JOBS: 1
+          CARGO_BUILD_JOBS: 2
           CARGO_TARGET_DIR: /nix/build/cargo-target
 
       - name: Optimize Wasm
