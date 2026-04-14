@@ -3,6 +3,8 @@ Web Version: https://yeshey.github.io/bevy-game/ (Is the github action working?)
 
 # A Bevy game
 
+If you want a peer to peer web game, use [matchbox](https://github.com/johanhelsing/matchbox), look here: https://johanhelsing.studio/posts/extreme-bevy
+
 ## How to run
 
 - mobile: `cargo apk run -p mobile`
