@@ -5,6 +5,8 @@ Web Version: https://yeshey.github.io/bevy-game/ (Is the github action working?)
 
 If you want a peer to peer web game, use [matchbox](https://github.com/johanhelsing/matchbox), look here: https://johanhelsing.studio/posts/extreme-bevy
 
+maybe OrbitDB or PeerBit (https://github.com/dao-xyz/peerbit) would be a good idea for database tracking.
+
 ```
 New player opens browser
        ↓
